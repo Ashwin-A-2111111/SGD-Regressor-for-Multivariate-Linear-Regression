@@ -24,72 +24,58 @@ Program to implement the multivariate linear regression model for predicting the
 Developed by: Shruthi.S
 RegisterNumber:  212222220044
 */
-
 import numpy as np
+import pandas as pd
 from sklearn.datasets import fetch_california_housing
 from sklearn.linear_model import SGDRegressor
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
+dataset = fetch_california_housing()
+df=pd.DataFrame(dataset.data,columns=dataset.feature_names)
+df['HousingPrice']=dataset.target
+print(df.head())
+```
+![image](https://github.com/user-attachments/assets/ad791d97-12e6-4627-82e6-0b1d7f85a704)
+```
+X = df.drop(columns=['AveOccup','HousingPrice'])
+X.info()
+```
+![image](https://github.com/user-attachments/assets/e10112c5-3b59-4a1d-a9f2-394188f12161)
+```
+Y = df[['AveOccup','HousingPrice']]
+Y.info()
+```
+![image](https://github.com/user-attachments/assets/a4949cf4-ca8a-429d-9aec-21773f15c834)
+```
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+scaler_X = StandardScaler()
+scaler_Y = StandardScaler()
+X_train = scaler_X.fit_transform(X_train)
+X_test = scaler_X.transform(X_test)
+Y_train = scaler_Y.fit_transform(Y_train)
+Y_test = scaler_Y.transform(Y_test)
+sgd = SGDRegressor(max_iter=1000, tol=1e-3)
+multi_output_sgd = MultiOutputRegressor(sgd)
+multi_output_sgd.fit(X_train, Y_train)
+```
+![image](https://github.com/user-attachments/assets/a584154f-0dec-44c7-aea1-000950ef4e38)
 
-
-data = fetch_california_housing()
-
-
-x= data.data[:,:3]
-
-
-y=np.column_stack((data.target,data.data[:,6]))
-
-x_train, x_test, y_train,y_test = train_test_split(x,y, test_size = 0.2, random_state =42)
-
-scaler_x = StandardScaler()
-scaler_y = StandardScaler()
-
-x_train = scaler_x.fit_transform(x_train)
-x_test = scaler_x.fit_transform(x_test)
-y_train = scaler_y.fit_transform(y_train)
-y_test = scaler_y.fit_transform(y_test)
-
-sgd = SGDRegressor(max_iter=1000, tol = 1e-3)
-
-multi_output_sgd= MultiOutputRegressor(sgd)
-
-multi_output_sgd.fit(x_train, y_train)
-
-y_pred =multi_output_sgd.predict(x_test)
-
-y_pred = scaler_y.inverse_transform(y_pred)
-y_test = scaler_y.inverse_transform(y_test)
-print(y_pred)
-[[ 1.04860312 35.69231257]
- [ 1.49909521 35.72530255]
- [ 2.35760015 35.50646978]
- ...
- [ 4.47157887 35.06594388]
- [ 1.70991815 35.75406191]
- [ 1.79884624 35.34680017]]
-
-mse = mean_squared_error(y_test,y_pred)
-
-print("Mean Squared Error:",mse)
-
-Mean Squared Error: 2.560165984862198
-
-print("\nPredictions:\n",y_pred[:5])
-Predictions:
- [[ 1.04860312 35.69231257]
- [ 1.49909521 35.72530255]
- [ 2.35760015 35.50646978]
- [ 2.73967825 35.37568192]
- [ 2.10914107 35.63894336]]
+```
+Y_pred = multi_output_sgd.predict(X_test)
+Y_pred = scaler_Y.inverse_transform(Y_pred)
+Y_test = scaler_Y.inverse_transform(Y_test)
+mse = mean_squared_error(Y_test, Y_pred)
+print("Mean Squared Error:", mse)
+```
+![image](https://github.com/user-attachments/assets/0a0eadaf-3286-4a3a-87dc-b69939697142)
+```
+print("\nPredictions:\n", Y_pred[:5])
 ```
 ## Output:
 
-Mean:
-
-![image](https://github.com/user-attachments/assets/1e6c626f-8096-49d4-93b8-97ca749326d3)
+![image](https://github.com/user-attachments/assets/2229c44a-9837-4c06-adc1-040f5936c022)
 
 
 ## Result:
